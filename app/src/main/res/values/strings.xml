@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">WhackAMoleApp</string>
+    <string name="menu">Menu</string>
+    <string name="game">Game</string>
+    <string name="play">Play</string>
+    <string name="choose_number_of_holes">Choose number of holes</string>
+    <string name="the_highest_score">The Highest score: %1$d</string>
+    <string name="rules">The rules of the game are simple, don`t worry about it.\nStay cool and relax!</string>
+    <string name="score_is">Score: %1$d</string>
+    <string name="see_results">See Results</string>
+    <string name="preparing_the_game">Preparing the game…</string>
+    <string name="time_left_is">Time left: %1$d</string>
+    <string name="mole">Mole</string>
+    <string name="play_again">Play Again</string>
+    <string name="your_score_is">Your score: %1$d</string>
+    <string name="congratulations">Congratulations!\nThe highest score is broken by you!</string>
+
 </resources>

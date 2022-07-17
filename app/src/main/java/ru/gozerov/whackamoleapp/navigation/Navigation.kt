@@ -8,54 +8,55 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-sealed class Screens(route: String) {
+sealed class Screens(val simpleRoute: String, val route: String = simpleRoute) {
     object MenuScreen: Screens("menuScreen")
-    object GameScreen: Screens("gameScreen")
+    object GameScreen: Screens(simpleRoute = "gameScreen/", route = "gameScreen/{cells}")
+    object MainScreen: Screens("mainScreen")
+    object ResultsScreen: Screens(simpleRoute = "resultsScreen/", route = "resultsScreen/{score}")
 }
 
 @Composable
 fun NavigationRouter(
     startDestination: String,
-    parentController: NavController,
+    tabController: NavController,
+    activityController: NavController,
+    argument: Pair<String, NavArgumentBuilder.() -> Unit>? = null,
     screens: List<Pair<String, @Composable (
         currentController: NavController,
-        parentController: NavController
+        tabController: NavController,
+        activityController: NavController,
+        backStackEntry: NavBackStackEntry?
     ) -> Unit>>
 ) {
     val navController = rememberNavController()
     NavHost(
         navController = navController, startDestination = startDestination) {
         screens.forEach { pair ->
-            composable(pair.first) { pair.second(
-                currentController = navController,
-                parentController = parentController,
-            ) }
-
+            if (argument != null) {
+                composable(
+                    route = pair.first,
+                    arguments = listOf(navArgument(argument.first, argument.second))
+                ) { backStackEntry ->
+                    pair.second(
+                        currentController = navController,
+                        tabController = tabController,
+                        activityController = activityController,
+                        backStackEntry = backStackEntry
+                    )
+                }
+            }
+            else {
+                composable(
+                    route = pair.first,
+                ) {
+                    pair.second(
+                        currentController = navController,
+                        tabController = tabController,
+                        activityController = activityController,
+                        backStackEntry = null
+                    )
+                }
+            }
         }
     }
-}
-fun NavController.navigate(
-    route: String,
-    args: Bundle,
-    builder: (NavOptionsBuilder.() -> Unit)? = null,
-) {
-    val routeLink = NavDeepLinkRequest
-        .Builder
-        .fromUri(NavDestination.createRoute(route).toUri())
-        .build()
-
-    val deepLinkMatch = graph.matchDeepLink(routeLink)
-    if (deepLinkMatch != null) {
-        val destination = deepLinkMatch.destination
-        val id = destination.id
-        builder?.let {
-            navigate(id, args, navOptions(it))
-        } ?: navigate(id, args, null)
-    } else {
-        throw IllegalArgumentException("navigation destination $route was not found")
-    }
-}
-
-fun NavController.getArguments(): Bundle? {
-    return this.currentBackStackEntry?.arguments
 }
